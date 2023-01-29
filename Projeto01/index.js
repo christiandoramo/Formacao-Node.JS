@@ -2,9 +2,12 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 // bodyparser converte as informações do post para uma forma legivel pelo js
-const connection = require('./database/database')
+const connec = require('./database/database')
+// tabela pergunta será criada logo nessa execução do Model pergunta no index.js
+const perguntaModel = require('./database/Model-Pergunta')
+const { response } = require('express')
 
-connection
+connec
   .authenticate()
   .then(() => {
     console.log('conexão com database rodando')
@@ -19,19 +22,39 @@ app.use(bodyParser.urlencoded({ extended: false })) // decodificação com o bod
 app.use(bodyParser.json()) // lê agora os json
 
 app.get('/', (requisicao, resposta) => {
-  resposta.render('index')
+  // findAll é como SELECT * ALL FROM perguntas...
+  perguntaModel
+    .findAll({
+      //raw: true quer dizer que o findall vai fazer um vistoria CRUA, ou seja só os dados
+      raw: true,
+      order: [
+        ['id', 'DESC'], // DESC = descrecente ASC = crescente -> ordenação pelo id usando o sequelize
+      ],
+    })
+    .then((perguntas) => {
+      resposta.render('index', {
+        perguntas: perguntas, //novo json passando perguntas para o html/ejs
+      })
+    })
 })
+
 app.get('/perguntar', (requisicao, resposta) => {
   resposta.render('perguntar')
 })
 
 app.post('/postpergunta', (requisicao, resposta) => {
+  // body vem do bodyparser
   let titulo = requisicao.body.titulo
   let descricao = requisicao.body.descricao
-  titulo = titulo
-  descricao = descricao
-  resposta.send(
-    `Formulario postado com sucesso\nTítulo: ${titulo} Descrição: ${descricao}`,
-  )
+  // create é como INSERT INTO perguntas...
+  perguntaModel
+    .create({
+      titulo: titulo,
+      descricao: descricao,
+    })
+    .then(() => {
+      resposta.redirect('/')
+    })
 })
+
 app.listen(10, () => console.log('rodando server'))

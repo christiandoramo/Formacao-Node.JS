@@ -1,6 +1,24 @@
 <%- include("partials/header.ejs")  %> 
 <body>
     <%- include("partials/navbar.ejs")  %> 
-   <h1>Bootstrap importado com sucesso?</h1>
+    <div class="container">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h1>Perguntas</h1>
+                <button class="btn btn-primary">Perguntar</button>
+            </div>
+            <div class="card-body">
+                <!-- mostrando os dados do back-end no front-end -->
+                <% perguntas.forEach( function(pergunta){ %>
+                <p><strong><%= pergunta.titulo %></strong></p>
+                <div class="card-footer">
+                    <button class="btn btn-primary">Responder</button>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 <%- include("partials/footer.ejs")  %> 
