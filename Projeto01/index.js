@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const connec = require('./database/database')
 // tabela pergunta será criada logo nessa execução do Model pergunta no index.js
 const perguntaModel = require('./database/Model-Pergunta')
-const { response } = require('express')
+const Pergunta = require('./database/Model-Pergunta')
 
 connec
   .authenticate()
@@ -55,6 +55,25 @@ app.post('/postpergunta', (requisicao, resposta) => {
     .then(() => {
       resposta.redirect('/')
     })
+})
+
+app.get('/pergunta/:id', (req, res) => {
+  let id = req.params.id
+  Pergunta.findOne({
+    // pega o dado dps compara e retorna com um do database
+    where: { id: id },
+  }).then((perguntaAchada) => {
+    if (perguntaAchada != undefined) {
+      // pergunta achada
+      res.render('pergunta', {
+        pergunta: perguntaAchada,
+        titulo: perguntaAchada.titulo,
+      })
+    } else {
+      // sem pergunta achada
+      res.redirect('/')
+    }
+  })
 })
 
 app.listen(10, () => console.log('rodando server'))
