@@ -6,6 +6,7 @@ const connec = require('./database/database')
 // tabela pergunta será criada logo nessa execução do Model pergunta no index.js
 const perguntaModel = require('./database/Model-Pergunta')
 const Pergunta = require('./database/Model-Pergunta')
+const Resposta = require('./database/Model-Resposta')
 
 connec
   .authenticate()
@@ -64,15 +65,33 @@ app.get('/pergunta/:id', (req, res) => {
     where: { id: id },
   }).then((perguntaAchada) => {
     if (perguntaAchada != undefined) {
-      // pergunta achada
-      res.render('pergunta', {
-        pergunta: perguntaAchada,
-        titulo: perguntaAchada.titulo,
+      Resposta.findAll({
+        where: { perguntaId: perguntaAchada.id },
+        order: [
+          ['id', 'DESC'], // ordendando por mais recente(usando id decrescente)
+        ],
+      }).then((respostas) => {
+        res.render('pergunta', {
+          pergunta: perguntaAchada,
+          titulo: perguntaAchada.titulo,
+          respostas: respostas,
+        })
       })
     } else {
       // sem pergunta achada
       res.redirect('/')
     }
+  })
+})
+
+app.post('/responder', (req, res) => {
+  let corpo = req.body.corpo
+  let perguntaId = req.body.pergunta // pergunta tem o valor do Id no post do HTML
+  Resposta.create({
+    corpo: corpo,
+    perguntaId: perguntaId,
+  }).then(() => {
+    res.redirect(`/pergunta/${perguntaId}`)
   })
 })
 

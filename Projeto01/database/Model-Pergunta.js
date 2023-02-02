@@ -14,7 +14,7 @@ const Pergunta = database.define('perguntas', {
 })
 // enviando
 Pergunta.sync({ force: false }).then(() => {
-  console.log('Tabela criada com sucesso')
+  console.log('Tabela-Perguntas atualizada criada com sucesso')
 })
 
 // exportando o objeto Pergunta do modulo para ser usado em index.js
